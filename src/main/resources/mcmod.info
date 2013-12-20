@@ -1,0 +1,23 @@
+[
+   {
+      "modid":"DRASH",
+      "name":"DRASH",
+      "description":"A dynamic recipe and structure helper",
+      "version":"${version}",
+	  "mcversion": "${mcversion}",
+      "url":"",
+      "updateUrl":"",
+      "authorList":[
+         "PaleoCrafter"
+      ],
+      "credits":"By PaleoCrafter",
+      "logoFile":"/assets/drash/logo.png",
+      "screenshots":[
+
+      ],
+      "parent":"",
+      "dependencies":[
+        "mod_MinecraftForge"
+      ]
+   }
+]
