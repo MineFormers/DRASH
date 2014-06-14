@@ -1,6 +1,6 @@
 [
    {
-      "modid":"DRASH",
+      "modid":"drash",
       "name":"DRASH",
       "description":"A dynamic recipe and structure helper",
       "version":"${version}",

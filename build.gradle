@@ -5,39 +5,73 @@ buildscript {
             name = "forge"
             url = "http://files.minecraftforge.net/maven"
         }
+        maven {
+            name = "sonatype"
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:1.0-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
     }
 }
 
 apply plugin: 'forge'
+apply plugin: 'scala'
+apply plugin: 'maven'
 
-version = "1.1"
-group="de.mineformers.drash" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+version = '1.2'
+group = "de.mineformers" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "drash"
 
 minecraft {
-	version = "1.6.4-9.11.1.964"
+    version = "1.7.2-10.12.1.1112"
 }
 
-jar { 
-	dependsOn classes 
-	from sourceSets.main.java 
-} 
-
-processResources
-{
+processResources {
     // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
-                
+
         // replace version and mcversion
-        expand 'version':project.version, 'mcversion':project.minecraft.version
+        expand 'version': project.version, 'mcversion': project.minecraft.version
     }
-        
+
     // copy everything else, thats not the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
+}
+
+jar {
+    classifier = 'universal'
+}
+
+compileScala {
+    scalaCompileOptions.optimize = true
+}
+
+// add a source jar
+task sourceJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'src'
+}
+
+// add a javadoc jar
+task javadocJar(type: Jar, dependsOn: scaladoc) {
+    classifier = 'javadoc'
+    from 'build/docs/scaladoc'
+}
+
+// because the normal output has been made to be obfuscated
+task deobfJar(type: Jar) {
+    from sourceSets.main.output
+    classifier = 'deobf'
+}
+
+artifacts {
+    archives sourceJar
+    archives deobfJar
+    archives javadocJar
 }

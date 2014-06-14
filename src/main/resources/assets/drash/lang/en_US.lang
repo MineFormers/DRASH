@@ -1,0 +1,6 @@
+label.drash:calcRecipe=Calculate Resources
+label.drash:calcItem=Calculate Resources for\n%s
+label.drash:back=Back
+label.drash:close=Close
+label.drash:amount=Amount
+key.calcRecipe=Calculate Resources
