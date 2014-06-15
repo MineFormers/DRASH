@@ -45,6 +45,8 @@ class FindRecipeFrame extends Frame(Size(216, 222)) {
   scroll.position += Point(0, 8)
   selectPanel.add(scroll)
 
+
+
   add(selectPanel)
 
   reactions += {
@@ -56,6 +58,12 @@ class FindRecipeFrame extends Frame(Size(216, 222)) {
               switchToCalc(s.current)
           case _ =>
         }
+  }
+
+  override def update(mousePos: Point): Unit = {
+    super.update(mousePos)
+    if(selectionActive && scroll.content.nonEmpty && !scroll.content.head.enabled)
+      scroll.content.foreach(_.enabled = true)
   }
 
   def switchToCalc(stack: ItemStack): Unit = {
@@ -73,7 +81,6 @@ class FindRecipeFrame extends Frame(Size(216, 222)) {
       c.deafTo(channel)
       c.deafTo(context)
     }
-    scroll.content.foreach(_.enabled = true)
     content = Seq(selectPanel)
     text.focus()
   }

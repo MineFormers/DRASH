@@ -22,6 +22,6 @@ class Structures {
   }
 
   def load(key: String, resource: ResourceLocation): Unit = {
-    add(key, ModMaticFile.load(resource).getStructure)
+    add(key, ModMaticFile.load(resource).structure)
   }
 }

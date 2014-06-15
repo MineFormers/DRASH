@@ -11,7 +11,7 @@ import net.minecraft.block.material.Material
 import net.minecraft.world.World
 import net.minecraft.entity.player.EntityPlayer
 import de.mineformers.core.util.ResourceUtils.Resource
-import de.mineformers.drash.api.structure.{Structure, StructureHelper, ModMaticFile}
+import de.mineformers.drash.api.structure._
 import net.minecraft.nbt.{CompressedStreamTools, NBTTagCompound}
 import java.io.FileOutputStream
 import de.mineformers.core.registry.SharedBlockRegistry
@@ -22,15 +22,16 @@ import scala.collection.mutable
 import de.mineformers.core.util.world.BlockPos
 import net.minecraftforge.common.MinecraftForge
 import de.mineformers.drash.renderer.StructureWorldRenderer
+import net.minecraft.client.settings.KeyBinding
+import org.lwjgl.input.Keyboard
+import cpw.mods.fml.client.registry.ClientRegistry
+import net.minecraftforge.oredict.OreDictionary
+import net.minecraft.init.Blocks
 import de.mineformers.drash.recipe.RecipeTraverser
 import cpw.mods.fml.common.eventhandler.SubscribeEvent
 import cpw.mods.fml.common.gameevent.InputEvent.KeyInputEvent
-import net.minecraft.client.settings.KeyBinding
-import org.lwjgl.input.Keyboard
 import net.minecraft.client.Minecraft
 import de.mineformers.drash.gui.FindRecipeFrame
-import cpw.mods.fml.client.registry.ClientRegistry
-import net.minecraftforge.oredict.OreDictionary
 
 /**
  * DRASH
@@ -125,9 +126,28 @@ object Environment {
     override def init(): Unit = {
       ClientRegistry.registerKeyBinding(keyFind)
       StructureRegistry.add("test", Resource("drash", "test.modmatic"))
-      MinecraftForge.EVENT_BUS.register(new StructureWorldRenderer)
+      val renderer = new StructureWorldRenderer
+      MinecraftForge.EVENT_BUS.register(renderer)
+      FMLCommonHandler.instance().bus().register(renderer)
       FMLCommonHandler.instance().bus().register(this)
-      this.setActive(0, BlockPos(0, 5, 0), StructureRegistry.get("test"))
+      val layer1 = new ConfigurableLayer(3, 3)
+      for (x <- 0 until 3; z <- 0 until 3 if !(x == z && x == 1 && z == 1)) {
+        layer1.set(new MultiBlockInfo(x, z, Seq(BlockEntry(Blocks.log, 0), BlockEntry(Blocks.log, 1), BlockEntry(Blocks.log, 2), BlockEntry(Blocks.log, 3))))
+      }
+      val layer2 = new ConfigurableLayer(3, 3, required = true)
+      layer2.set(new MultiBlockInfo(0, 0, Seq(BlockEntry(Blocks.stained_glass, 4), BlockEntry(Blocks.cobblestone, 0))))
+      layer2.set(new MultiBlockInfo(2, 2, Seq(BlockEntry(Blocks.stone, 0), BlockEntry(Blocks.cobblestone, 0))))
+      layer2.set(new MultiBlockInfo(0, 2, Seq(BlockEntry(Blocks.stone, 0), BlockEntry(Blocks.cobblestone, 0))))
+      layer2.set(new MultiBlockInfo(2, 0, Seq(BlockEntry(Blocks.stone, 0), BlockEntry(Blocks.cobblestone, 0))))
+      val layer3 = new ConfigurableLayer(3, 3, min = 1, max = 2)
+      for (x <- 0 until 3; z <- 0 until 3 if !(x == z && x == 1 && z == 1)) {
+        layer3.set(new MultiBlockInfo(x, z, Seq(BlockEntry(Blocks.log, 0), BlockEntry(Blocks.log, 1), BlockEntry(Blocks.log, 2), BlockEntry(Blocks.log, 3))))
+      }
+      val config = new StructureConfiguration(Seq(layer1, layer2, layer3))
+      config.amount += 0 -> 1
+      config.amount += 1 -> 1
+      config.amount += 2 -> 2
+      this.setActive(0, BlockPos(0, 5, 0), config.build())
     }
 
     override def postInit(): Unit = {

@@ -24,9 +24,9 @@ import net.minecraft.util.AxisAlignedBB
  * @author PaleoCrafter
  */
 class StructureWorld(_structure: Structure, val pos: BlockPos) extends World(new SaveHandlerMP, "DRASH", null, StructureWorld.Settings, null) {
-  private val structure = _structure.copy()
+  val structure = _structure.copy
   val tiles = mutable.HashMap.empty[BlockPos, TileEntity]
-  for (y <- 0 until structure.getHeight; layer = structure.getLayer(y); x <- 0 until layer.getWidth; z <- 0 until layer.getLength) {
+  for (y <- 0 until structure.getHeight; layer = structure.getLayer(y); x <- 0 until layer.width; z <- 0 until layer.length) {
     val info = layer.get(x, z)
     if (info != null && info.getTileEntity != null) {
       val tile = info.getBlock.createTileEntity(this, info.getMetadata)
@@ -43,6 +43,14 @@ class StructureWorld(_structure: Structure, val pos: BlockPos) extends World(new
   }
   val renderer = new RenderBlocks(this)
   var chunkRenderers = createRenderChunkList()
+
+  override def markBlockForUpdate(x : Int, y : Int, z : Int): Unit = {
+    for(render <- chunkRenderers) {
+      if(BlockPos(x, y, z).containedBy(render.bounds)) {
+        render.update = true
+      }
+    }
+  }
 
   override def getBlock(x: Int, y: Int, z: Int): Block = {
     val info = structure.getBlock(x, y, z)
